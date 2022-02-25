@@ -21,6 +21,7 @@ let task_name = "";
 let b3dm_url = [];
 let download_root = "";
 let worker = 1;
+let base_url = "";
 
 const emit = defineEmits(["success"]);
 let active = ref(0);
@@ -28,7 +29,7 @@ let can_next = ref(true);
 let next_title = ref("下一步");
 const next = () => {
   if (active.value++ > 2) {
-    emit("addTaskSuccess", { b3dm_url, download_root, worker, task_name });
+    emit("addTaskSuccess", { b3dm_url, download_root, worker, task_name, base_url });
   }
   if (active.value === 2) next_title.value = "完成";
   can_next.value = true;
@@ -42,6 +43,7 @@ const listener = (value) => {
   if (step === 1) {
     task_name = value.name;
     b3dm_url = value.data_url;
+    base_url = value.base_url;
   } else if (step === 2) {
     download_root = value.dir;
   } else if (step === 3) {

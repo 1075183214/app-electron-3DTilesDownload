@@ -55,28 +55,53 @@ const count = ref(0);
 let task = [];
 let task_count = 1;
 const addQueue = (value) => {
-  let { b3dm_url, download_root, task_name } = value;
-  task.push({ task_name, b3dm_url, success: {}, error: {}, is_delete: false, is_stop: false, download_root });
+  let { b3dm_url, download_root, task_name, base_url } = value;
+  task.push({
+    task_name,
+    b3dm_url,
+    success: {},
+    error: {},
+    is_delete: false,
+    is_stop: false,
+    is_success: false,
+    is_start: false,
+    download_root,
+    base_url
+  });
 };
-const download = (task, url) => {
+const schedule = () => {
+  setInterval(() => {
+    for (let item in task) {
+      if (!item.is_stop && !item.is_delete && !item.is_start && !item.is_success) {
+        for (let d in item.b3dm_url) {
+          download(task, item.base_url + "/" + d.path, d.path);
+        }
+      }
+    }
+  }, 10000);
+};
+const download = (task, url, path) => {
   fetch(url, { method: "GET", mode: "cors" })
     .then((response) => {
       if (response.status == 200) {
         let buffer = await response.arrayBuffer();
         buffer = Buffer.from(buffer);
         const name = url.substring(url.lastIndexOf("/") + 1, url.length);
-        writeOut(buffer, task.download_root, name);
+        writeOut(buffer, task.download_root + "/" + path);
+        task.success[path] = true;
       } else {
-        task.error[url] = false;
+        task.error[path] = false;
       }
     })
     .catch((error) => {
       task.error[url] = false;
     });
 };
-const writeOut = (dataBuffer, dir, name) => {
-  fs.writeFileSync(this.outDir[0] + "\\" + name, dataBuffer);
+const writeOut = (dataBuffer, file_path) => {
+  fs.writeFileSync(file_path, dataBuffer);
 };
+
+schedule();
 </script>
 <style lang="less" scoped>
 .el-avatar--default {

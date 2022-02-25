@@ -95,7 +95,7 @@ const parseChildren = (children, path) => {
   }
 };
 const success = () => {
-  emit("success", { index: 1, data_url, name: form.name });
+  emit("success", { index: 1, data_url, name: form.name, base_url });
 };
 let lastNumber;
 const is_url_load_over = () => {
