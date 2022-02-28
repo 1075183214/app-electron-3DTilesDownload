@@ -4,7 +4,7 @@
     <el-step title="任务参数" :icon="UploadFilled"></el-step>
     <el-step title="下载设置" :icon="Picture"></el-step>
   </el-steps>
-  <component :is="active === 0 ? Step1 : active === 1 ? Step2 : Step3"></component>
+  <component :is="active === 0 ? Step1 : active === 1 ? Step2 : Step3" @success="listener"></component>
   <el-button class="next" type="success" style="margin-top: 12px" @click="next" :disabled="can_next">{{ next_title }}</el-button>
 </template>
 <script setup>
@@ -28,8 +28,9 @@ let active = ref(0);
 let can_next = ref(true);
 let next_title = ref("下一步");
 const next = () => {
-  if (active.value++ > 2) {
-    emit("addTaskSuccess", { b3dm_url, download_root, worker, task_name, base_url });
+  active.value++;
+  if (active.value > 2) {
+    emit("success", { b3dm_url, download_root, worker, task_name, base_url });
   }
   if (active.value === 2) next_title.value = "完成";
   can_next.value = true;

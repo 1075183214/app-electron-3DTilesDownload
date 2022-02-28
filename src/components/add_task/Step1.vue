@@ -13,6 +13,7 @@
 <script setup>
 import { reactive, defineEmits } from "vue";
 import { ElMessage } from "element-plus";
+const { net } = require("electron");
 
 const form = reactive({
   url: "",
@@ -38,10 +39,11 @@ const parse_url = () => {
 
 let task_count = 0; // 任务总数
 let task_over_count = 0; // 任务完成数量
+
 const get_b3dm_url = (url, path) => {
   task_count++;
   const task = new Promise((resolve, reject) => {
-    fetch(url, { method: "GET", mode: "cors" })
+    fetch(url, { method: "GET", mode: "cors", credentials: "omit" })
       .then((response) => {
         return response.json();
       })
@@ -95,6 +97,7 @@ const parseChildren = (children, path) => {
   }
 };
 const success = () => {
+  console.log("success");
   emit("success", { index: 1, data_url, name: form.name, base_url });
 };
 let lastNumber;

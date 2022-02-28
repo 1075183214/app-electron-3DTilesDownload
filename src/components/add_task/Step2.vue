@@ -16,11 +16,11 @@ const form = reactive({
 });
 const emit = defineEmits(["success"]); // defineEmits不是个函数或者对象，是编译setup时候的一个标识
 const success = () => {
-  emit("success", { index: 1, dir: form.dir });
+  emit("success", { index: 2, dir: form.dir });
 };
 const select_dir = () => {
   const dir = ipcRenderer.sendSync("synchronous-message", "openDirSelect");
-  this.form.dir = dir;
+  form.dir = dir[0];
   success();
 };
 </script>

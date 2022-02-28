@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, Menu, ipcMain, dialog } = require("electron");
+const { app, BrowserWindow, Menu, ipcMain, dialog, session } = require("electron");
 const path = require("path");
 let mainWindow;
 function createWindow() {
@@ -12,13 +12,12 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-    },
+      webSecurity: false
+    }
   });
 
   // vite 构建后使用静态文件地址，否则使用启动的服务器地址
-  const URL = app.isPackaged
-    ? path.join(__dirname, "src/dist/index.html")
-    : "http://localhost:3000";
+  const URL = app.isPackaged ? path.join(__dirname, "src/dist/index.html") : "http://localhost:3000";
   console.log(URL);
   app.isPackaged ? mainWindow.loadFile(URL) : mainWindow.loadURL(URL);
 }
@@ -27,6 +26,11 @@ app.whenReady().then(() => {
 
   app.on("activate", function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  });
+
+  var cookie = { name: "dummy_name", value: "dummy", secure: true, sameSite: none };
+  session.defaultSession.cookies.set(cookie, function (error) {
+    if (error) console.error(error);
   });
 });
 app.on("window-all-closed", function () {
@@ -38,7 +42,11 @@ app.on("window-all-closed", function () {
  */
 ipcMain.on("synchronous-message", (event, arg) => {
   const path = dialog.showOpenDialogSync(mainWindow, {
-    properties: ["openDirectory"],
+    properties: ["openDirectory"]
   });
   event.returnValue = path;
 });
+
+/**
+ *
+ */

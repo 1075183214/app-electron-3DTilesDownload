@@ -8,10 +8,11 @@
     "build": "vite build",
     "preview": "vite preview",
     "start": "electron .",
-    "dist": "electron-builder"
+    "dist": "electron-packager ./ B3DM_Download-v1.1 --platform=win32 --arch=x64 --overwrite"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^0.2.7",
+    "electron-packager": "^15.4.0",
     "element-plus": "^2.0.2",
     "less": "^4.1.2",
     "less-loader": "^10.2.0",

@@ -34,15 +34,13 @@
         </el-menu>
       </el-aside>
       <el-container>
-        <el-main class="pageBox"><AddTask @add-task-success="addQueue"></AddTask></el-main>
+        <el-main class="pageBox"><AddTask @success="addQueue"></AddTask></el-main>
       </el-container>
     </el-container>
   </el-container>
 </template>
 <script setup>
-import { t } from "../dist/assets/vendor.65715d52";
-
-const { ipcRenderer } = require("electron");
+const fs = require("fs");
 import { ref } from "vue";
 import CurrentTask from "./CurrentTask.vue";
 import AddTask from "./AddTask.vue";
@@ -54,11 +52,14 @@ defineProps({
 const count = ref(0);
 let task = [];
 let task_count = 1;
+
+// 添加任务队列
 const addQueue = (value) => {
-  let { b3dm_url, download_root, task_name, base_url } = value;
+  let { b3dm_url, download_root, task_name, base_url, worker } = value;
   task.push({
     task_name,
     b3dm_url,
+    worker,
     success: {},
     error: {},
     is_delete: false,
@@ -69,38 +70,78 @@ const addQueue = (value) => {
     base_url
   });
 };
+
+// 任务调度
 const schedule = () => {
-  setInterval(() => {
-    for (let item in task) {
+  setInterval(async () => {
+    for (let item of task) {
+      check_success(item);
+
       if (!item.is_stop && !item.is_delete && !item.is_start && !item.is_success) {
-        for (let d in item.b3dm_url) {
-          download(task, item.base_url + "/" + d.path, d.path);
+        item.is_start = true;
+        for (let [index, d] of item.b3dm_url.entries()) {
+          if (index > item.worker) {
+            return;
+          }
+          if (item.success[d.path] || item.error[d.path]) {
+            return;
+          }
+          download(item, item.base_url + "/" + d.path, d.path);
         }
       }
     }
   }, 10000);
 };
+
+// 检查任务是否完成
+const check_success = (sub_task) => {
+  const success_keys = Object.keys(sub_task.success);
+  const error_keys = Object.keys(sub_task.error);
+  if (sub_task.b3dm_url.length <= success_keys.length + error_keys.length) {
+    sub_task.is_success = true; // 标志完成
+    return true;
+  } else {
+    return false;
+  }
+};
+
+// 处理返回信息
+const deal_download_file = async (response, task, url, path) => {
+  let buffer = await response.arrayBuffer();
+  buffer = Buffer.from(buffer);
+  const name = url.substring(url.lastIndexOf("/") + 1, url.length);
+  writeOut(buffer, task.download_root + "\\" + path.replace("/", ""));
+};
+
+// 执行fetch下载，标识状态
 const download = (task, url, path) => {
-  fetch(url, { method: "GET", mode: "cors" })
-    .then((response) => {
+  fetch(url, { method: "GET", mode: "cors", credentials: "omit" })
+    .then(async (response) => {
       if (response.status == 200) {
-        let buffer = await response.arrayBuffer();
-        buffer = Buffer.from(buffer);
-        const name = url.substring(url.lastIndexOf("/") + 1, url.length);
-        writeOut(buffer, task.download_root + "/" + path);
+        deal_download_file(response, task, url, path);
         task.success[path] = true;
       } else {
-        task.error[path] = false;
+        task.error[path] = true;
       }
     })
     .catch((error) => {
-      task.error[url] = false;
+      task.error[path] = true;
     });
 };
+
+// node写出文件
 const writeOut = (dataBuffer, file_path) => {
-  fs.writeFileSync(file_path, dataBuffer);
+  fs.writeFile(file_path, dataBuffer, () => {});
 };
 
+// 工具 - 线程等待
+const wait_10_sec = () => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve();
+    }, 10);
+  });
+};
 schedule();
 </script>
 <style lang="less" scoped>
