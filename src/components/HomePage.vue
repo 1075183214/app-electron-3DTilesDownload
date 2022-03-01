@@ -35,10 +35,10 @@
             <el-button type="success" size="medium" @click="menuSelect(3)">添加任务</el-button>
           </el-button-group>
         </el-header>
-        <el-main class="pageBox">
+        <el-main class="pageBox" v-cloak>
           <component
             :tasks="task"
-            :is="active === 0 ? CurrentTask : active === 1 ? CurrentTask : active === 2 ? CurrentTask : AddTask"
+            :is="active === 0 ? CurrentTask : active === 1 ? finishedTask : active === 2 ? cancelTask : AddTask"
             @success="addQueue"
             @delete-task="deleteTask"
             @stop-task="stopTask"
@@ -53,6 +53,8 @@ const fs = require("fs");
 const { ipcRenderer } = require("electron");
 import { ref, reactive } from "vue";
 import CurrentTask from "./CurrentTask.vue";
+import cancelTask from "./cancel.vue";
+import finishedTask from "./Finished.vue";
 import AddTask from "./AddTask.vue";
 import { Location, Document, Menu as IconMenu, Setting } from "@element-plus/icons-vue";
 defineProps({
@@ -86,6 +88,7 @@ const deleteTask = (value) => {
   for (let item of task) {
     if (item.task_name === value.task_name) {
       item.is_delete = true;
+      item.is_start = false;
     }
   }
 };
@@ -93,7 +96,7 @@ const deleteTask = (value) => {
 // 读取保存的任务队列
 const read_saved_task = () => {
   try {
-    let data = fs.readFileSync(__dirname + "\\" + task.backup, "utf8");
+    let data = fs.readFileSync(__dirname + "\\task.backup", "utf8");
     const task_arr = JSON.parse(data);
     task.push.apply(task, task_arr);
   } catch (e) {
@@ -173,7 +176,6 @@ const deal_download_file = async (response, task, url, path) => {
   const name = url.substring(url.lastIndexOf("/") + 1, url.length);
   writeOut(buffer, task.download_root + path.replaceAll("/", "\\"));
 };
-
 // 执行fetch下载，标识状态
 const download = (task, url, path) => {
   fetch(url, { method: "GET", mode: "cors", credentials: "omit" })
@@ -191,12 +193,16 @@ const download = (task, url, path) => {
 };
 
 // node写出文件
-const writeOut = (dataBuffer, file_path) => {
+const writeOut = (dataBuffer, file_path, callback) => {
   const dir = file_path.substring(0, file_path.lastIndexOf("\\"));
   if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir);
+    fs.mkdirSync(dir, { recursive: true });
   }
-  fs.writeFile(file_path, dataBuffer, () => {});
+  fs.writeFile(file_path, dataBuffer, () => {
+    if (typeof callback === "function") {
+      callback();
+    }
+  });
 };
 
 // 工具 - 线程等待
@@ -210,12 +216,15 @@ const wait_10_sec = () => {
 
 // 退出保存任务信息
 ipcRenderer.on("saveTask", (event, arg) => {
-  const root = event.value;
-  save_task(root);
+  save_task();
 });
-const save_task = (root) => {
+const save_task = () => {
   const str = JSON.stringify(task);
-  writeOut(str, __dirname + "\\" + task.backup);
+  writeOut(str, __dirname + "\\task.backup", send_quit_singal);
+};
+const send_quit_singal = () => {
+  console.log("quit");
+  ipcRenderer.sendSync("quit", "quit");
 };
 </script>
 <style lang="less" scoped>
@@ -228,6 +237,7 @@ const save_task = (root) => {
   align-items: flex-end;
   border-bottom: 1px solid #dcdde0;
   padding-bottom: 5px;
+  flex-direction: row-reverse;
 }
 .el-main {
   --el-main-padding: 10px;

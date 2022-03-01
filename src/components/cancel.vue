@@ -1,14 +1,11 @@
 <template>
   <el-space wrap>
     <div v-for="task in tasks" :key="task.task_name">
-      <el-card class="box-card" v-if="!task.is_delete">
+      <el-card class="box-card" v-if="task.is_delete === true">
         <template #header>
           <div class="card-header">
             <span>{{ task.task_name }}</span>
-            <div>
-              <el-button class="button" type="text" @click="stop_task(task)">{{ task.is_stop ? "启动" : "暂停" }}</el-button>
-              <el-button class="button" type="text" @click="delete_task(task)">取消</el-button>
-            </div>
+            <div></div>
           </div>
         </template>
         <span>文件总数: {{ task.b3dm_url.length }}</span>
@@ -28,6 +25,7 @@ defineProps({
   }
 });
 let to_stop = false;
+let stopStatus = ref("暂停");
 const emit = defineEmits(["delete-task"]);
 const delete_task = (task) => {
   emit("delete-task", { task_name: task.task_name });
@@ -35,6 +33,11 @@ const delete_task = (task) => {
 const stop_task = (task) => {
   to_stop = !to_stop;
   emit("stop-task", { task_name: task.task_name, to_stop });
+  if (to_stop) {
+    stopStatus.value = "启动";
+  } else {
+    stopStatus.value = "暂停";
+  }
 };
 </script>
 <style lang="less" scoped>

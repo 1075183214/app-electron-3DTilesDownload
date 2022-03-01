@@ -21,6 +21,11 @@ function createWindow() {
   const URL = app.isPackaged ? path.join(__dirname, "src/dist/index.html") : "http://localhost:3000";
   console.log(URL);
   app.isPackaged ? mainWindow.loadFile(URL) : mainWindow.loadURL(URL);
+
+  mainWindow.on("close", (event) => {
+    event.preventDefault();
+    mainWindow.webContents.send("saveTask");
+  });
 }
 app.whenReady().then(() => {
   createWindow();
@@ -28,17 +33,9 @@ app.whenReady().then(() => {
   app.on("activate", function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
-
-  var cookie = { name: "dummy_name", value: "dummy", secure: true, sameSite: none };
-  session.defaultSession.cookies.set(cookie, function (error) {
-    if (error) console.error(error);
-  });
 });
 app.on("window-all-closed", function () {
   if (process.platform !== "darwin") app.quit();
-});
-app.on("before-quit", function () {
-  mainWindow.webContents.send("saveTask", __dirname);
 });
 /**
  * 监听消息
@@ -53,3 +50,6 @@ ipcMain.on("synchronous-message", (event, arg) => {
 /**
  *获取__dirname
  */
+ipcMain.on("quit", (event, arg) => {
+  mainWindow.destroy();
+});

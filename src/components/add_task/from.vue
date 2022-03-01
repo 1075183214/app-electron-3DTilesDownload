@@ -1,29 +1,39 @@
 <template>
   <el-form ref="formRef" :model="form" label-width="120px">
-    <el-form-item>
-      <el-form-item label="任务名称">
-        <el-input v-model="form.name" placeholder="xxx/tileset.json"></el-input>
-      </el-form-item>
-      <el-form-item label="输入地址">
-        <el-input v-model="form.url" placeholder="xxx/tileset.json" @change="parse_url"></el-input>
-      </el-form-item>
+    <el-form-item label="任务名称">
+      <el-input v-model="form.name" placeholder="名称"></el-input>
+    </el-form-item>
+    <el-form-item label="输入地址">
+      <el-input v-model="form.url" placeholder="组织文件地址" @change="parse_url"></el-input>
+    </el-form-item>
+    <el-form-item label="选择下载目录">
+      <el-input v-model="form.dir" @click="select_dir"></el-input>
+    </el-form-item>
+    <el-form-item label="起始位置">
+      <el-input v-model.number="form.worker"></el-input>
     </el-form-item>
   </el-form>
 </template>
 <script setup>
 import { reactive, defineEmits } from "vue";
 import { ElMessage } from "element-plus";
-const { net } = require("electron");
+const { ipcRenderer } = require("electron");
 
 const form = reactive({
   url: "",
-  name: ""
+  name: "",
+  dir: "",
+  worker: 0
 });
 const emit = defineEmits(["success"]); // defineEmits不是个函数或者对象，是编译setup时候的一个标识
 console.log(typeof defineEmits); // undefined
 const data_url = []; // b3dm实体地址
 const promise_arr = []; // 任务序列
 let base_url = "";
+const select_dir = () => {
+  const dir = ipcRenderer.sendSync("synchronous-message", "openDirSelect");
+  form.dir = dir[0];
+};
 const parse_url = () => {
   if (!is_B3DMURL_url(form.url)) {
     ElMessage({
@@ -96,7 +106,7 @@ const parseChildren = (children, path) => {
   }
 };
 const success = () => {
-  emit("success", { index: 1, data_url, name: form.name, base_url });
+  emit("success", { index: 1, data_url, name: form.name, base_url, dir: form.dir, worker: form.worker });
 };
 let lastNumber;
 const is_url_load_over = () => {
