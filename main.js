@@ -2,6 +2,7 @@
 const { app, BrowserWindow, Menu, ipcMain, dialog, session } = require("electron");
 const path = require("path");
 let mainWindow;
+// Menu.setApplicationMenu(null);
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 800,
@@ -36,7 +37,9 @@ app.whenReady().then(() => {
 app.on("window-all-closed", function () {
   if (process.platform !== "darwin") app.quit();
 });
-
+app.on("before-quit", function () {
+  mainWindow.webContents.send("saveTask", __dirname);
+});
 /**
  * 监听消息
  */
@@ -48,5 +51,5 @@ ipcMain.on("synchronous-message", (event, arg) => {
 });
 
 /**
- *
+ *获取__dirname
  */

@@ -84,7 +84,6 @@ const parseChildren = (children, path) => {
       }
       if (is_B3DM_url(item.content.uri)) {
         data_url.push({ path: path + "/" + item.content.uri });
-        console.log(base_url + path + "/" + item.content.uri);
       } else if (is_B3DMURL_url(item.content.uri)) {
         let _url = item.content.uri;
         let _path = _url.substring(0, _url.lastIndexOf("/"));
@@ -97,7 +96,6 @@ const parseChildren = (children, path) => {
   }
 };
 const success = () => {
-  console.log("success");
   emit("success", { index: 1, data_url, name: form.name, base_url });
 };
 let lastNumber;
@@ -109,7 +107,7 @@ const is_url_load_over = () => {
     } else {
       lastNumber = task_over_count;
     }
-  }, 5000);
+  }, 1000);
 };
 const is_B3DM_url = (url) => {
   const patt = /.b3dm/;

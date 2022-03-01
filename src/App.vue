@@ -8,7 +8,7 @@ import HomePage from "./components/HomePage.vue";
 html,
 body {
   width: 100%;
-  height: 100vh;
+  height: calc(100vh - 1px);
   margin: 0;
 }
 #app {

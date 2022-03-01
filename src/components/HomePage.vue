@@ -1,32 +1,28 @@
 <template>
   <el-container>
-    <el-header>
-      <el-avatar src="../image/头像.jpg"></el-avatar>
-      <el-button-group>
-        <el-button type="success" size="small" :icon="ArrowLeft">添加任务</el-button>
-        <el-button type="success" size="small"> 全部暂停</el-button>
-        <el-button type="success" size="small"> 全部取消</el-button>
-      </el-button-group>
-    </el-header>
     <el-container>
       <el-aside width="148px">
-        <el-menu default-active="1" class="el-menu-vertical-demo">
-          <el-menu-item index="1">
-            <el-icon><location /></el-icon>
-            <span>当前任务</span>
-          </el-menu-item>
-          <el-menu-item index="2">
-            <el-icon><icon-menu /></el-icon>
-            <span>已完成</span>
-          </el-menu-item>
-          <el-menu-item index="3">
-            <el-icon><document /></el-icon>
-            <span>失败任务</span>
-          </el-menu-item>
-          <el-menu-item index="4">
-            <el-icon><document /></el-icon>
-            <span>任务统计</span>
-          </el-menu-item>
+        <div>
+          <div class="block">
+            <el-image src="../image/头像.jpg"></el-image>
+          </div>
+          <el-menu default-active="0" class="el-menu-vertical-demo" @select="menuSelect">
+            <el-menu-item index="0">
+              <el-icon><location /></el-icon>
+              <span>当前任务</span>
+            </el-menu-item>
+            <el-menu-item index="1">
+              <el-icon><icon-menu /></el-icon>
+              <span>已完成</span>
+            </el-menu-item>
+            <el-menu-item index="2">
+              <el-icon><document /></el-icon>
+              <span>已取消</span>
+            </el-menu-item>
+          </el-menu>
+        </div>
+
+        <el-menu class="el-menu-vertical-demo" @select="menuSelect">
           <el-menu-item index="4">
             <el-icon><setting /></el-icon>
             <span>系统设置</span>
@@ -34,14 +30,28 @@
         </el-menu>
       </el-aside>
       <el-container>
-        <el-main class="pageBox"><AddTask @success="addQueue"></AddTask></el-main>
+        <el-header>
+          <el-button-group>
+            <el-button type="success" size="medium" @click="menuSelect(3)">添加任务</el-button>
+          </el-button-group>
+        </el-header>
+        <el-main class="pageBox">
+          <component
+            :tasks="task"
+            :is="active === 0 ? CurrentTask : active === 1 ? CurrentTask : active === 2 ? CurrentTask : AddTask"
+            @success="addQueue"
+            @delete-task="deleteTask"
+            @stop-task="stopTask"
+          ></component>
+        </el-main>
       </el-container>
     </el-container>
   </el-container>
 </template>
 <script setup>
 const fs = require("fs");
-import { ref } from "vue";
+const { ipcRenderer } = require("electron");
+import { ref, reactive } from "vue";
 import CurrentTask from "./CurrentTask.vue";
 import AddTask from "./AddTask.vue";
 import { Location, Document, Menu as IconMenu, Setting } from "@element-plus/icons-vue";
@@ -50,8 +60,47 @@ defineProps({
 });
 
 const count = ref(0);
-let task = [];
+let task = reactive([]);
 let task_count = 1;
+
+let active = ref(0); // 0 - 当前任务  1 - 已完成 / 2 - 已取消  / 3 -添加任务 /4 - 系统设置
+
+const menuSelect = (index) => {
+  active.value = parseInt(index);
+};
+
+// 取消任务
+const stopTask = (value) => {
+  for (let item of task) {
+    if (item.task_name === value.task_name) {
+      item.is_stop = value.to_stop;
+    }
+    if (!value.to_stop) {
+      item.is_start = false;
+    }
+  }
+};
+
+// 停止任务
+const deleteTask = (value) => {
+  for (let item of task) {
+    if (item.task_name === value.task_name) {
+      item.is_delete = true;
+    }
+  }
+};
+
+// 读取保存的任务队列
+const read_saved_task = () => {
+  try {
+    let data = fs.readFileSync(__dirname + "\\" + task.backup, "utf8");
+    const task_arr = JSON.parse(data);
+    task.push.apply(task, task_arr);
+  } catch (e) {
+    console.log(e);
+  }
+};
+read_saved_task();
 
 // 添加任务队列
 const addQueue = (value) => {
@@ -63,35 +112,47 @@ const addQueue = (value) => {
     success: {},
     error: {},
     is_delete: false,
-    is_stop: false,
-    is_success: false,
-    is_start: false,
+    is_stop: false, // 任务整体是否停止
+    is_success: false, // 任务整体是否完成
+    is_start: false, // 指示当前是否在运行
     download_root,
     base_url
   });
+
+  // 切换到current_task
+  active.value = 0;
 };
 
-// 任务调度
+/**
+ * 任务调度
+ *    使用定时器每隔10秒调度一次任务
+ *    队列中的当前未进行（start）且没stop、delete、success的任务开始下载
+ *    下载中如果stop、delete、success 结束任务进行（for循环结束）
+ */
 const schedule = () => {
   setInterval(async () => {
     for (let item of task) {
       check_success(item);
-
       if (!item.is_stop && !item.is_delete && !item.is_start && !item.is_success) {
         item.is_start = true;
         for (let [index, d] of item.b3dm_url.entries()) {
-          if (index > item.worker) {
+          if (item.is_delete || item.is_stop) {
             return;
+          }
+          if (index < item.worker) {
+            continue;
           }
           if (item.success[d.path] || item.error[d.path]) {
-            return;
+            continue;
           }
+          await wait_10_sec();
           download(item, item.base_url + "/" + d.path, d.path);
         }
       }
     }
   }, 10000);
 };
+schedule();
 
 // 检查任务是否完成
 const check_success = (sub_task) => {
@@ -110,7 +171,7 @@ const deal_download_file = async (response, task, url, path) => {
   let buffer = await response.arrayBuffer();
   buffer = Buffer.from(buffer);
   const name = url.substring(url.lastIndexOf("/") + 1, url.length);
-  writeOut(buffer, task.download_root + "\\" + path.replace("/", ""));
+  writeOut(buffer, task.download_root + path.replaceAll("/", "\\"));
 };
 
 // 执行fetch下载，标识状态
@@ -131,6 +192,10 @@ const download = (task, url, path) => {
 
 // node写出文件
 const writeOut = (dataBuffer, file_path) => {
+  const dir = file_path.substring(0, file_path.lastIndexOf("\\"));
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir);
+  }
   fs.writeFile(file_path, dataBuffer, () => {});
 };
 
@@ -142,7 +207,16 @@ const wait_10_sec = () => {
     }, 10);
   });
 };
-schedule();
+
+// 退出保存任务信息
+ipcRenderer.on("saveTask", (event, arg) => {
+  const root = event.value;
+  save_task(root);
+});
+const save_task = (root) => {
+  const str = JSON.stringify(task);
+  writeOut(str, __dirname + "\\" + task.backup);
+};
 </script>
 <style lang="less" scoped>
 .el-avatar--default {
@@ -159,17 +233,52 @@ schedule();
   --el-main-padding: 10px;
 }
 .el-button-group {
-  margin-left: 117px;
+  // margin-left: 117px;
   margin-bottom: 5px;
 }
 .el-aside {
   --el-aside-width: 149px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-right: 1px solid #dcdde0;
 }
 .pageBox {
   height: calc(100vh - 70px);
   position: relative;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  justify-content: flex-start;
+  align-items: flex-start;
+
+  :deep(.el-card) {
+    width: 240px;
+  }
+  :deep(.el-card__header) {
+    padding: 5px;
+    border-bottom: 1px solid var(--el-card-border-color);
+    box-sizing: border-box;
+  }
+  :deep(.el-card__body) {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    align-content: flex-start;
+    justify-content: flex-start;
+    align-items: flex-start;
+    line-height: 30px;
+    padding: 10px;
+    font-size: 12px;
+  }
 }
 a {
   color: #42b983;
+}
+.block {
+  height: 60px;
+  /* width: 60px; */
+  text-align: center;
 }
 </style>
