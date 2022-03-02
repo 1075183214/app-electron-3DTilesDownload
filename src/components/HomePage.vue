@@ -1,12 +1,12 @@
 <template>
-  <el-container>
+  <el-container style="height: 100%">
     <el-container>
-      <el-aside width="148px">
+      <el-aside width="64px">
         <div>
           <div class="block">
             <el-image src="../image/头像.jpg"></el-image>
           </div>
-          <el-menu default-active="0" class="el-menu-vertical-demo" @select="menuSelect">
+          <el-menu default-active="0" :collapse="true" class="el-menu-vertical-demo" @select="menuSelect">
             <el-menu-item index="0">
               <el-icon><location /></el-icon>
               <span>当前任务</span>
@@ -22,18 +22,16 @@
           </el-menu>
         </div>
 
-        <el-menu class="el-menu-vertical-demo" @select="menuSelect">
+        <el-menu class="el-menu-vertical-demo" :collapse="true" @select="menuSelect">
           <el-menu-item index="4">
             <el-icon><setting /></el-icon>
             <span>系统设置</span>
           </el-menu-item>
         </el-menu>
       </el-aside>
-      <el-container>
+      <el-container style="background-color: rgba(255, 255, 255, 0.3)">
         <el-header>
-          <el-button-group>
-            <el-button type="success" size="medium" @click="menuSelect(3)">添加任务</el-button>
-          </el-button-group>
+          <el-button type="success" :icon="CirclePlus" @click="menuSelect(3)">新建</el-button>
         </el-header>
         <el-main class="pageBox" v-cloak>
           <component
@@ -56,7 +54,7 @@ import CurrentTask from "./CurrentTask.vue";
 import cancelTask from "./cancel.vue";
 import finishedTask from "./Finished.vue";
 import AddTask from "./AddTask.vue";
-import { Location, Document, Menu as IconMenu, Setting } from "@element-plus/icons-vue";
+import { Location, Document, Menu as IconMenu, Setting, CirclePlus } from "@element-plus/icons-vue";
 defineProps({
   msg: String
 });
@@ -216,6 +214,10 @@ const wait_10_sec = () => {
 
 // 退出保存任务信息
 ipcRenderer.on("saveTask", (event, arg) => {
+  for (let item of task) {
+    item.is_stop = true;
+    item.is_start = false;
+  }
   save_task();
 });
 const save_task = () => {
@@ -235,9 +237,9 @@ const send_quit_singal = () => {
   display: flex;
   justify-content: flex-start;
   align-items: flex-end;
-  border-bottom: 1px solid #dcdde0;
+  border-bottom: 1px solid grey;
   padding-bottom: 5px;
-  flex-direction: row-reverse;
+  align-items: center;
 }
 .el-main {
   --el-main-padding: 10px;
@@ -247,11 +249,14 @@ const send_quit_singal = () => {
   margin-bottom: 5px;
 }
 .el-aside {
-  --el-aside-width: 149px;
+  --el-aside-width: 64px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   border-right: 1px solid #dcdde0;
+  background-color: white;
+  --el-aside-width: 64px;
+  overflow-x: hidden;
 }
 .pageBox {
   height: calc(100vh - 70px);
@@ -290,5 +295,15 @@ a {
   height: 60px;
   /* width: 60px; */
   text-align: center;
+  padding-left: 8px;
+  padding-right: 8px;
+  padding-top: 6px;
+
+  .el-image {
+    border-radius: 50%;
+    img {
+      border-radius: 50%;
+    }
+  }
 }
 </style>
