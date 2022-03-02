@@ -4,7 +4,7 @@
       <el-aside width="64px">
         <div>
           <div class="block">
-            <el-image src="../image/头像.jpg"></el-image>
+            <el-image src="../image/cat.jpg"></el-image>
           </div>
           <el-menu default-active="0" :collapse="true" class="el-menu-vertical-demo" @select="menuSelect">
             <el-menu-item index="0">
