@@ -47,14 +47,16 @@
   </el-container>
 </template>
 <script setup>
-const fs = require("fs");
-const { ipcRenderer } = require("electron");
 import { ref, reactive } from "vue";
 import CurrentTask from "./CurrentTask.vue";
 import cancelTask from "./cancel.vue";
 import finishedTask from "./Finished.vue";
 import AddTask from "./AddTask.vue";
 import { Location, Document, Menu as IconMenu, Setting, CirclePlus } from "@element-plus/icons-vue";
+
+const fs = require("fs");
+const { ipcRenderer } = require("electron");
+
 defineProps({
   msg: String
 });
@@ -105,11 +107,12 @@ read_saved_task();
 
 // 添加任务队列
 const addQueue = (value) => {
-  let { b3dm_url, download_root, task_name, base_url, worker } = value;
+  let { b3dm_url, download_root, json_data, task_name, base_url, worker } = value;
   task.push({
     task_name,
     b3dm_url,
     worker,
+    json_data,
     success: {},
     error: {},
     is_delete: false,
@@ -136,6 +139,11 @@ const schedule = () => {
       check_success(item);
       if (!item.is_stop && !item.is_delete && !item.is_start && !item.is_success) {
         item.is_start = true;
+        // 写入json
+        for (let [index, d] of item.json_data.entries()) {
+          writeOut(d.data, item.download_root + d.path.replaceAll("/", "\\") + "\\tileset.json");
+        }
+        // 下载实体
         for (let [index, d] of item.b3dm_url.entries()) {
           if (item.is_delete || item.is_stop) {
             return;

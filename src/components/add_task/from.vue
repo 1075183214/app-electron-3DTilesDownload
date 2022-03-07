@@ -28,8 +28,10 @@ const form = reactive({
 const emit = defineEmits(["success"]); // defineEmits不是个函数或者对象，是编译setup时候的一个标识
 console.log(typeof defineEmits); // undefined
 const data_url = []; // b3dm实体地址
+const json_data = [];
 const promise_arr = []; // 任务序列
 let base_url = "";
+
 const select_dir = () => {
   const dir = ipcRenderer.sendSync("synchronous-message", "openDirSelect");
   form.dir = dir[0];
@@ -59,6 +61,8 @@ const get_b3dm_url = (url, path) => {
       })
       .then((data) => {
         const root = data.root;
+
+        json_data.push({ path, data: JSON.stringify(data) });
 
         if (root.content) {
           if (root.content.uri === undefined && root.content.url !== undefined) {
@@ -106,7 +110,7 @@ const parseChildren = (children, path) => {
   }
 };
 const success = () => {
-  emit("success", { index: 1, data_url, name: form.name, base_url, dir: form.dir, worker: form.worker });
+  emit("success", { index: 1, data_url, name: form.name, base_url, json_data, dir: form.dir, worker: form.worker });
 };
 let lastNumber;
 const is_url_load_over = () => {
@@ -140,5 +144,8 @@ a {
 }
 .el-input {
   min-width: 260px;
+}
+:deep(.el-form-item__label) {
+  color: white;
 }
 </style>
