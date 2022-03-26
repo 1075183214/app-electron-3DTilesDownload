@@ -142,8 +142,11 @@ const schedule = () => {
         }
         // 下载实体
         for (let [index, d] of item.b3dm_url.entries()) {
-          if (item.is_delete || item.is_stop) {
+          if (item.is_delete) {
             return;
+          }
+          while (item.is_stop) {
+            await wait_10_sec();
           }
           if (index < item.worker) {
             continue;
@@ -213,7 +216,7 @@ const wait_10_sec = () => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       resolve();
-    }, 10);
+    }, 200);
   });
 };
 
@@ -227,7 +230,7 @@ ipcRenderer.on("saveTask", (event, arg) => {
 });
 const save_task = () => {
   const str = JSON.stringify(task);
-  // writeOut(str, __dirname + "\\task.backup", send_quit_singal);
+  writeOut(str, __dirname + "\\task.backup", send_quit_singal);
 };
 const send_quit_singal = () => {
   console.log("quit");

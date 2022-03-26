@@ -2,7 +2,6 @@
 const { app, BrowserWindow, Menu, ipcMain, dialog, session } = require("electron");
 const path = require("path");
 let mainWindow;
-Menu.setApplicationMenu(null);
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 800,
