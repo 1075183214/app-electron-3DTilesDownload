@@ -1,18 +1,26 @@
 <template>
   <el-space wrap>
     <div v-for="task in tasks" :key="task.task_name">
-      <el-card class="box-card">
+      <el-card class="box-card" v-if="task.is_success == true">
         <template #header>
           <div class="card-header">
             <span>{{ task.task_name }}</span>
             <div>
-              <el-button v-if="Object.keys(task.error).length > 0" class="button" type="text" @click="retry(task)">重试</el-button>
+              <el-button v-if="Object.keys(task.error).length > 0 && task.is_delete == false" class="button" type="text" @click="retry(task)"
+                >重试</el-button
+              >
             </div>
           </div>
         </template>
-        <span>文件总数: {{ task.b3dm_url.length }}</span>
-        <span>已完成: {{ Object.keys(task.success).length }}</span>
-        <span>已失败: {{ Object.keys(task.error).length }}</span>
+        <span
+          >文件总数: <span style="color: forestgreen">{{ task.b3dm_url.length }}</span></span
+        >
+        <span
+          >已完成: <span style="color: green">{{ Object.keys(task.success).length }}</span></span
+        >
+        <span
+          >已失败: <span style="color: red">{{ Object.keys(task.error).length }}</span></span
+        >
       </el-card>
     </div>
   </el-space>

@@ -1,19 +1,25 @@
 <template>
   <el-space wrap>
     <div v-for="task in tasks" :key="task.task_name">
-      <el-card class="box-card" v-if="!task.is_delete">
+      <el-card class="box-card" v-if="!task.is_delete && !task.is_success">
         <template #header>
           <div class="card-header">
-            <span>{{ task.task_name }}</span>
+            <span style="font-weight: bolder">{{ task.task_name }}</span>
             <div>
               <el-button class="button" type="text" @click="stop_task(task)">{{ task.is_stop ? "启动" : "暂停" }}</el-button>
               <el-button class="button" type="text" @click="delete_task(task)">取消</el-button>
             </div>
           </div>
         </template>
-        <span>文件总数: {{ task.b3dm_url.length }}</span>
-        <span>已完成: {{ Object.keys(task.success).length }}</span>
-        <span>已失败: {{ Object.keys(task.error).length }}</span>
+        <span
+          >文件总数: <span style="color: forestgreen">{{ task.b3dm_url.length }}</span></span
+        >
+        <span
+          >已完成: <span style="color: green">{{ Object.keys(task.success).length }}</span></span
+        >
+        <span
+          >已失败: <span style="color: red">{{ Object.keys(task.error).length }}</span></span
+        >
       </el-card>
     </div>
   </el-space>

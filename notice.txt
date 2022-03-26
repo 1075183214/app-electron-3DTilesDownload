@@ -2,3 +2,135 @@
 npm config set ELECTRON_MIRROR http://npm.taobao.org/mirrors/electron/
 
 // 先编译后打包
+
+
+
+{
+  "LAYERS": {
+    "BUILDING": [
+      {
+        //        "Name": "臺北市建物模型",
+        //        "Url": "https://3dtiles.nlsc.gov.tw/building/tiles3d/0/tileset.json"
+      },
+      {
+        "Name": "臺中市建物模型",
+        "Url": "https://3dtiles.nlsc.gov.tw/building/tiles3d/1/tileset.json"
+      },
+      {
+        //        "Name": "基隆市建物模型",
+        //        "Url": "https://3dtiles.nlsc.gov.tw/building/tiles3d/2/tileset.json"
+      },
+      {
+        "Name": "臺南市建物模型",
+        "Url": "https://3dtiles.nlsc.gov.tw/building/tiles3d/3/tileset.json"
+      },
+      {
+        "Name": "高雄市建物模型",
+        "Url": "https://3dtiles.nlsc.gov.tw/building/tiles3d/4/tileset.json"
+      },
+      {
+        "Name": "新北市建物模型",
+        "Url": "https://3dtiles.nlsc.gov.tw/building/tiles3d/5/tileset.json"
+      },
+      {
+        "Name": "宜蘭縣建物模型",
+        "Url": "https://3dtiles.nlsc.gov.tw/building/tiles3d/6/tileset.json"
+      },
+      {
+        "Name": "桃園市建物模型",
+        "Url": "https://3dtiles.nlsc.gov.tw/building/tiles3d/7/tileset.json"
+      },
+      {
+        "Name": "嘉義市建物模型",
+        //"Url": "https://3dtiles.nlsc.gov.tw/building/tiles3d/8/tileset.json"
+      },
+      {
+        "Name": "新竹縣建物模型",
+        "Url": "https://3dtiles.nlsc.gov.tw/building/tiles3d/9/tileset.json"
+      },
+      {
+        "Name": "苗栗縣建物模型",
+        "Url": "https://3dtiles.nlsc.gov.tw/building/tiles3d/10/tileset.json"
+      },
+      {
+        "Name": "南投縣建物模型",
+        "Url": "https://3dtiles.nlsc.gov.tw/building/tiles3d/11/tileset.json"
+      },
+      {
+        "Name": "彰化縣建物模型",
+        "Url": "https://3dtiles.nlsc.gov.tw/building/tiles3d/12/tileset.json"
+      },
+      {
+      //  "Name": "新竹市建物模型",
+        //"Url": "https://3dtiles.nlsc.gov.tw/building/tiles3d/13/tileset.json"
+      },
+      {
+        "Name": "雲林縣建物模型",
+        "Url": "https://3dtiles.nlsc.gov.tw/building/tiles3d/14/tileset.json"
+      },
+      {
+        "Name": "嘉義縣建物模型",\
+        "Url": "https://3dtiles.nlsc.gov.tw/building/tiles3d/15/tileset.json"
+      },
+      {
+        "Name": "屏東縣建物模型",
+        "Url": "https://3dtiles.nlsc.gov.tw/building/tiles3d/16/tileset.json"
+      },
+      {
+        "Name": "花蓮縣建物模型",
+        "Url": "https://3dtiles.nlsc.gov.tw/building/tiles3d/17/tileset.json"
+      },
+      {
+        "Name": "臺東縣建物模型",
+        "Url": "https://3dtiles.nlsc.gov.tw/building/tiles3d/18/tileset.json"
+      },
+      {
+       // "Name": "金門縣建物模型",
+        "Url": "https://3dtiles.nlsc.gov.tw/building/tiles3d/19/tileset.json"
+      },
+      {
+       // "Name": "澎湖縣建物模型",
+        "Url": "https://3dtiles.nlsc.gov.tw/building/tiles3d/20/tileset.json"
+      },
+      {
+        //"Name": "連江縣建物模型",
+        "Url": "https://3dtiles.nlsc.gov.tw/building/tiles3d/21/tileset.json"
+      }
+    ],
+    "ROAD": [
+      {
+        "Name": "臺北市文山試辦區(108年)",
+        "Url": "https://3dtiles.nlsc.gov.tw/road/tiles3d/0/tileset.json"
+      },
+      {
+        "Name": "國道(109年)",
+        "Url": "https://3dtiles.nlsc.gov.tw/road/tiles3d/22/tileset.json"
+      }
+    ],
+    "ROAD2ND": [
+      {
+        "Name": "臺北市文山試辦區(108年)",
+        "Url": "https://3dtiles.nlsc.gov.tw/road2nd/tiles3d/0/tileset.json"
+      },
+      {
+        "Name": "臺中市(109年)",
+        "Url": "https://3dtiles.nlsc.gov.tw/road2nd/tiles3d/1/tileset.json"
+      },
+      {
+        "Name": "國道(109年)",
+        "Url": "https://3dtiles.nlsc.gov.tw/road2nd/tiles3d/22/tileset.json"
+      }
+    ],
+    "地形": [
+      {
+        "Name": "Terrain20M_正射影像",
+        "Url": "https://3dtiles.nlsc.gov.tw/Terrain20M/tiles3d/正射影像/0/0/0/tileset.json"
+      },
+      {
+        "Name": "Terrain20M_電子地圖",
+        "Url": "https://3dtiles.nlsc.gov.tw/Terrain20M/tiles3d/電子地圖/0/0/0/tileset.json"
+      }
+    ]
+  }
+
+}

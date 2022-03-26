@@ -51,6 +51,7 @@ const parse_url = () => {
 
 let task_count = 0; // 任务总数
 let task_over_count = 0; // 任务完成数量
+let root_fail = false;
 
 const get_b3dm_url = (url, path) => {
   task_count++;
@@ -83,6 +84,13 @@ const get_b3dm_url = (url, path) => {
         resolve();
       })
       .catch((error) => {
+        if (task_count == 1) {
+          root_fail = true;
+          ElMessage({
+            message: "根节点获取失败！",
+            type: "error"
+          });
+        }
         task_over_count++;
         console.error("Error:", error);
         resolve();
@@ -115,7 +123,7 @@ const success = () => {
 let lastNumber;
 const is_url_load_over = () => {
   const interval = setInterval(() => {
-    if (task_count === task_over_count && task_over_count === lastNumber) {
+    if (task_count === task_over_count && task_over_count === lastNumber && !root_fail) {
       success();
       window.clearInterval(interval);
     } else {
@@ -146,6 +154,6 @@ a {
   min-width: 260px;
 }
 :deep(.el-form-item__label) {
-  color: white;
+  color: black;
 }
 </style>

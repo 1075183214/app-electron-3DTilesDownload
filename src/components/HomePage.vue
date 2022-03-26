@@ -1,33 +1,27 @@
 <template>
-  <el-container style="height: 100%">
+  <el-container style="height: 100%; padding-top: 8px">
     <el-container>
       <el-aside width="64px">
         <div>
-          <div class="block">
-            <el-image src="../image/cat.jpg"></el-image>
-          </div>
           <el-menu default-active="0" :collapse="true" class="el-menu-vertical-demo" @select="menuSelect">
+            <el-menu-item index="4">
+              <el-icon><folder-add /></el-icon>
+              <span>新建</span>
+            </el-menu-item>
             <el-menu-item index="0">
-              <el-icon><location /></el-icon>
+              <el-icon><video-play /></el-icon>
               <span>当前任务</span>
             </el-menu-item>
             <el-menu-item index="1">
-              <el-icon><icon-menu /></el-icon>
+              <el-icon><folder-checked /></el-icon>
               <span>已完成</span>
             </el-menu-item>
             <el-menu-item index="2">
-              <el-icon><document /></el-icon>
+              <el-icon><folder-remove /></el-icon>
               <span>已取消</span>
             </el-menu-item>
           </el-menu>
         </div>
-
-        <el-menu class="el-menu-vertical-demo" :collapse="true" @select="menuSelect">
-          <el-menu-item index="4">
-            <el-icon><setting /></el-icon>
-            <span>新建</span>
-          </el-menu-item>
-        </el-menu>
       </el-aside>
       <el-container style="background-color: rgba(255, 255, 255, 0.3)">
         <el-main class="pageBox" v-cloak>
@@ -49,7 +43,7 @@ import CurrentTask from "./CurrentTask.vue";
 import cancelTask from "./cancel.vue";
 import finishedTask from "./Finished.vue";
 import AddTask from "./AddTask.vue";
-import { Location, Document, Menu as IconMenu, Setting, CirclePlus } from "@element-plus/icons-vue";
+import { FolderRemove, VideoPlay, FolderAdd, Setting, FolderChecked } from "@element-plus/icons-vue";
 
 const fs = require("fs");
 const { ipcRenderer } = require("electron");
@@ -216,7 +210,7 @@ const wait_10_sec = () => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       resolve();
-    }, 200);
+    }, 50);
   });
 };
 
@@ -252,6 +246,16 @@ const send_quit_singal = () => {
 .el-main {
   --el-main-padding: 8px;
 }
+.el-menu {
+  background-color: white;
+  color: black;
+  .el-menu-item {
+    color: greenyellow;
+  }
+  .el-menu-item:hover {
+    background-color: dimgray;
+  }
+}
 .el-button-group {
   // margin-left: 117px;
   margin-bottom: 5px;
@@ -263,7 +267,6 @@ const send_quit_singal = () => {
   justify-content: space-between;
   border-right: 1px solid #dcdde0;
   background-color: white;
-  --el-aside-width: 64px;
   overflow-x: hidden;
 }
 .pageBox {

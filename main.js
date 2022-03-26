@@ -2,6 +2,17 @@
 const { app, BrowserWindow, Menu, ipcMain, dialog, session } = require("electron");
 const path = require("path");
 let mainWindow;
+const template = [
+  {
+    label: '调试工具',
+    submenu: [
+      { label: '刷新', role: 'reload' },
+      { label: '控制面板', role: 'toggleDevTools' },
+    ]
+  },
+]
+const menu = Menu.buildFromTemplate(template)
+Menu.setApplicationMenu(menu);
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 800,
