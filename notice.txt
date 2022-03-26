@@ -1,0 +1,4 @@
+// electron 临时源
+npm config set ELECTRON_MIRROR http://npm.taobao.org/mirrors/electron/
+
+// 先编译后打包
