@@ -25,14 +25,11 @@
         <el-menu class="el-menu-vertical-demo" :collapse="true" @select="menuSelect">
           <el-menu-item index="4">
             <el-icon><setting /></el-icon>
-            <span>系统设置</span>
+            <span>新建</span>
           </el-menu-item>
         </el-menu>
       </el-aside>
       <el-container style="background-color: rgba(255, 255, 255, 0.3)">
-        <el-header>
-          <el-button type="success" :icon="CirclePlus" @click="menuSelect(3)">新建</el-button>
-        </el-header>
         <el-main class="pageBox" v-cloak>
           <component
             :tasks="task"
@@ -230,7 +227,7 @@ ipcRenderer.on("saveTask", (event, arg) => {
 });
 const save_task = () => {
   const str = JSON.stringify(task);
-  writeOut(str, __dirname + "\\task.backup", send_quit_singal);
+  // writeOut(str, __dirname + "\\task.backup", send_quit_singal);
 };
 const send_quit_singal = () => {
   console.log("quit");
@@ -250,7 +247,7 @@ const send_quit_singal = () => {
   align-items: center;
 }
 .el-main {
-  --el-main-padding: 10px;
+  --el-main-padding: 8px;
 }
 .el-button-group {
   // margin-left: 117px;
@@ -267,7 +264,7 @@ const send_quit_singal = () => {
   overflow-x: hidden;
 }
 .pageBox {
-  height: calc(100vh - 70px);
+  height: calc(100vh - 10px);
   position: relative;
   display: flex;
   flex-direction: row;
@@ -277,7 +274,7 @@ const send_quit_singal = () => {
   align-items: flex-start;
 
   :deep(.el-card) {
-    width: 240px;
+    width: 228px;
   }
   :deep(.el-card__header) {
     padding: 5px;
